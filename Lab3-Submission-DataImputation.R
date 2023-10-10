@@ -136,8 +136,13 @@ student_performance_dataset <-
     locale = readr::locale())
 
 
-## We select only the following 10 features to be included in the dataset:
+## We selected only the following 10 features to be included in the dataset:
 StudentPerformanceDataset_long <- student_performance_dataset %>%
   select(regret_choosing_bi, drop_bi_now, financial_wellness, health, day_out, 
          night_out, alcohol_or_narcotics, romantic_relationships, spiritual_wellnes,friendships)
+
+# We then select 100 random observations to be included in the dataset
+rand_ind <- sample(seq_len(nrow(StudentPerformanceDataset_long)), 100)
+student_performance_dataset <- StudentPerformanceDataset_long[rand_ind, ]
+
 
