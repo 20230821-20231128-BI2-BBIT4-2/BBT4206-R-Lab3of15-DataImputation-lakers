@@ -145,4 +145,31 @@ StudentPerformanceDataset_long <- student_performance_dataset %>%
 rand_ind <- sample(seq_len(nrow(StudentPerformanceDataset_long)), 100)
 student_performance_dataset <- StudentPerformanceDataset_long[rand_ind, ]
 
+# Are there missing values in the dataset?
+any_na(student_performance_dataset)
 
+# How many?
+n_miss(student_performance_dataset)
+
+# What is the percentage of missing data in the entire dataset?
+prop_miss(student_performance_dataset)
+
+# How many missing values does each variable have?
+student_performance_dataset %>% is.na() %>% colSums()
+
+# What is the number and percentage of missing values grouped by
+# each variable?
+miss_var_summary(student_performance_dataset)
+
+# What is the number and percentage of missing values grouped by
+# each observation?
+miss_case_summary(student_performance_dataset)
+
+# Which variables contain the most missing values?
+gg_miss_var(student_performance_dataset)
+
+# Where are missing values located (the shaded regions in the plot)?
+vis_miss(student_performance_dataset) + theme(axis.text.x = element_text(angle = 80))
+
+# Which combinations of variables are missing together?
+gg_miss_upset(student_performance_dataset)
