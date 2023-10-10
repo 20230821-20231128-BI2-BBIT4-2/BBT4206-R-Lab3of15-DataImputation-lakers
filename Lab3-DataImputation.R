@@ -383,6 +383,7 @@ Amelia::missmap(nhanes_dataset_imputed)
 any_na(nhanes_dataset_imputed)
 
 # How many?
+
 n_miss(nhanes_dataset_imputed)
 
 # What is the percentage of missing data in the entire dataset?
