@@ -234,3 +234,5 @@ gg_miss_var(student_performance_dataset_imputed)
 
 # Where are missing values located (the shaded regions in the plot)?
 vis_miss(student_performance_dataset_imputed) + theme(axis.text.x = element_text(angle = 80))
+
+gg_miss_upset(student_performance_dataset_imputed)
