@@ -217,7 +217,7 @@ n_miss(student_performance_dataset_imputed)
 prop_miss(student_performance_dataset_imputed)
 
 # How many missing values does each variable have?
-nhanes_dataset_imputed %>% is.na() %>% colSums()
+student_performance_dataset_imputed %>% is.na() %>% colSums()
 
 # What is the number and percentage of missing values grouped by
 # each variable?

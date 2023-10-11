@@ -7,9 +7,10 @@ Business Intelligence Lab Submission Markdown
 - [Setup Chunk](#setup-chunk)
 - [Load dataset](#load-dataset)
   - [Select features](#select-features)
-- [TABULAR OUTPUT](#tabular-output)
-  - [DECORATED TABULAR OUTPUT](#decorated-tabular-output)
-  - [VISUAL BAR CHART](#visual-bar-chart)
+- [Create new variable](#create-new-variable)
+  - [Strip plot visualization](#strip-plot-visualization)
+  - [Create impute data and carry out
+    confirmations](#create-impute-data-and-carry-out-confirmations)
 
 # Student Details
 
@@ -237,7 +238,7 @@ miss_case_summary(student_performance_dataset)
     ## # A tibble: 100 × 3
     ##     case n_miss pct_miss
     ##    <int>  <int>    <dbl>
-    ##  1    14      8       80
+    ##  1    42      8       80
     ##  2     1      0        0
     ##  3     2      0        0
     ##  4     3      0        0
@@ -270,18 +271,192 @@ gg_miss_upset(student_performance_dataset)
 
 ![](Lab3-Submission-DataImputation_files/figure-gfm/Confirm%20missingness-3.png)<!-- -->
 
-# TABULAR OUTPUT
+# Create new variable
 
-Tabular output of the evaluation per group per gender of the average
-level of learning attained rating.
+We created a new variable MAP
 
-## DECORATED TABULAR OUTPUT
+``` r
+# New variable MAP
+student_performance_dataset <- student_performance_dataset %>%
+    mutate(day_out = as.numeric(day_out), health = as.numeric(health), MAP = day_out +
+        (1/3) * (health - day_out))
 
-A decorated tabular.
+somewhat_correlated_variables <- quickpred(student_performance_dataset, mincor = 0.4)
 
-## VISUAL BAR CHART
+student_performance_dataset_mice <- mice(student_performance_dataset, m = 5, method = "pmm",
+    seed = 4, predictorMatrix = somewhat_correlated_variables)
+```
 
-A visual bar chart.
+    ## 
+    ##  iter imp variable
+    ##   1   1  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   1   2  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   1   3  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   1   4  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   1   5  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   2   1  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   2   2  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   2   3  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   2   4  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   2   5  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   3   1  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   3   2  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   3   3  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   3   4  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   3   5  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   4   1  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   4   2  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   4   3  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   4   4  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   4   5  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   5   1  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   5   2  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   5   3  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   5   4  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+    ##   5   5  financial_wellness  health  day_out  night_out  alcohol_or_narcotics  romantic_relationships  spiritual_wellnes  friendships  MAP
+
+## Strip plot visualization
+
+``` r
+# strip plot visualiziation
+stripplot(student_performance_dataset_mice, MAP ~ health | .imp, pch = 20, cex = 1)
+```
+
+![](Lab3-Submission-DataImputation_files/figure-gfm/Stripplot-1.png)<!-- -->
+
+``` r
+stripplot(student_performance_dataset_mice, MAP ~ night_out | .imp, pch = 20, cex = 1)
+```
+
+![](Lab3-Submission-DataImputation_files/figure-gfm/Stripplot-2.png)<!-- -->
+
+## Create impute data and carry out confirmations
+
+``` r
+# create imputed data
+student_performance_dataset_imputed <- mice::complete(student_performance_dataset_mice,
+    1)
+
+# confirmation
+miss_var_summary(student_performance_dataset_imputed)
+```
+
+    ## # A tibble: 11 × 3
+    ##    variable               n_miss pct_miss
+    ##    <chr>                   <int>    <dbl>
+    ##  1 regret_choosing_bi          0        0
+    ##  2 drop_bi_now                 0        0
+    ##  3 financial_wellness          0        0
+    ##  4 health                      0        0
+    ##  5 day_out                     0        0
+    ##  6 night_out                   0        0
+    ##  7 alcohol_or_narcotics        0        0
+    ##  8 romantic_relationships      0        0
+    ##  9 spiritual_wellnes           0        0
+    ## 10 friendships                 0        0
+    ## 11 MAP                         0        0
+
+``` r
+# visual confirmation
+Amelia::missmap(student_performance_dataset_imputed)
+```
+
+![](Lab3-Submission-DataImputation_files/figure-gfm/Create%20impute-1.png)<!-- -->
+
+``` r
+# Are there missing values in the dataset?
+any_na(student_performance_dataset_imputed)
+```
+
+    ## [1] FALSE
+
+``` r
+# How many?
+
+n_miss(student_performance_dataset_imputed)
+```
+
+    ## [1] 0
+
+``` r
+# What is the percentage of missing data in the entire dataset?
+prop_miss(student_performance_dataset_imputed)
+```
+
+    ## [1] 0
+
+``` r
+# How many missing values does each variable have?
+student_performance_dataset_imputed %>%
+    is.na() %>%
+    colSums()
+```
+
+    ##     regret_choosing_bi            drop_bi_now     financial_wellness 
+    ##                      0                      0                      0 
+    ##                 health                day_out              night_out 
+    ##                      0                      0                      0 
+    ##   alcohol_or_narcotics romantic_relationships      spiritual_wellnes 
+    ##                      0                      0                      0 
+    ##            friendships                    MAP 
+    ##                      0                      0
+
+``` r
+# What is the number and percentage of missing values grouped by each variable?
+miss_var_summary(student_performance_dataset_imputed)
+```
+
+    ## # A tibble: 11 × 3
+    ##    variable               n_miss pct_miss
+    ##    <chr>                   <int>    <dbl>
+    ##  1 regret_choosing_bi          0        0
+    ##  2 drop_bi_now                 0        0
+    ##  3 financial_wellness          0        0
+    ##  4 health                      0        0
+    ##  5 day_out                     0        0
+    ##  6 night_out                   0        0
+    ##  7 alcohol_or_narcotics        0        0
+    ##  8 romantic_relationships      0        0
+    ##  9 spiritual_wellnes           0        0
+    ## 10 friendships                 0        0
+    ## 11 MAP                         0        0
+
+``` r
+# What is the number and percentage of missing values grouped by each
+# observation?
+miss_case_summary(student_performance_dataset_imputed)
+```
+
+    ## # A tibble: 100 × 3
+    ##     case n_miss pct_miss
+    ##    <int>  <int>    <dbl>
+    ##  1     1      0        0
+    ##  2     2      0        0
+    ##  3     3      0        0
+    ##  4     4      0        0
+    ##  5     5      0        0
+    ##  6     6      0        0
+    ##  7     7      0        0
+    ##  8     8      0        0
+    ##  9     9      0        0
+    ## 10    10      0        0
+    ## # ℹ 90 more rows
+
+``` r
+# Which variables contain the most missing values?
+gg_miss_var(student_performance_dataset_imputed)
+```
+
+![](Lab3-Submission-DataImputation_files/figure-gfm/Create%20impute-2.png)<!-- -->
+
+``` r
+# We require the 'ggplot2' package to create more appealing visualizations
+
+# Where are missing values located (the shaded regions in the plot)?
+vis_miss(student_performance_dataset_imputed) + theme(axis.text.x = element_text(angle = 80))
+```
+
+![](Lab3-Submission-DataImputation_files/figure-gfm/Create%20impute-3.png)<!-- -->
 
 **etc.** as per the lab submission requirements. Be neat and communicate
 in a clear and logical manner.
