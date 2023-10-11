@@ -173,3 +173,6 @@ vis_miss(student_performance_dataset) + theme(axis.text.x = element_text(angle =
 
 # Which combinations of variables are missing together?
 gg_miss_upset(student_performance_dataset)
+
+student_performance_dataset <- student_performance_dataset %>%
+  mutate(MAP = financial_wellness + (1 / 3) * (health - financial_wellness))

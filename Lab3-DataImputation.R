@@ -210,7 +210,6 @@ if (!is.element("NHANES", installed.packages()[, 1])) {
                    repos = "https://cloud.r-project.org")
 }
 require("NHANES")
-
 ## dplyr ----
 if (!is.element("dplyr", installed.packages()[, 1])) {
   install.packages("dplyr", dependencies = TRUE,
